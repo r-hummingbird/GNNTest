@@ -15,7 +15,8 @@ from torch.autograd import Variable
 
 from GAT.utils import load_data, accuracy
 # from model import GAT, SpGAT
-from GAT.model import GAT
+from GAT.model import GAT, SpGAT
+
 # Training settings
 parser = argparse.ArgumentParser()
 parser.add_argument('--no-cuda', action='store_true', default=True, help='Disables CUDA training.')
@@ -44,26 +45,26 @@ if args.cuda:
 adj, features, labels, idx_train, idx_val, idx_test = load_data()
 
 # Model and optimizer
-# if args.sparse:
-#     model = SpGAT(nfeat=features.shape[1],
-#                 nhid=args.hidden,
-#                 nclass=int(labels.max()) + 1,
-#                 dropout=args.dropout,
-#                 nheads=args.nb_heads,
-#                 alpha=args.alpha)
-# else:
-#     model = GAT(nfeat=features.shape[1],
-#                 nhid=args.hidden,
-#                 nclass=int(labels.max()) + 1,
-#                 dropout=args.dropout,
-#                 nheads=args.nb_heads,
-#                 alpha=args.alpha)
-model = GAT(nfeat=features.shape[1],
+if args.sparse:
+    model = SpGAT(nfeat=features.shape[1],
                 nhid=args.hidden,
                 nclass=int(labels.max()) + 1,
                 dropout=args.dropout,
                 nheads=args.nb_heads,
                 alpha=args.alpha)
+else:
+    model = GAT(nfeat=features.shape[1],
+                nhid=args.hidden,
+                nclass=int(labels.max()) + 1,
+                dropout=args.dropout,
+                nheads=args.nb_heads,
+                alpha=args.alpha)
+# model = GAT(nfeat=features.shape[1],
+#                 nhid=args.hidden,
+#                 nclass=int(labels.max()) + 1,
+#                 dropout=args.dropout,
+#                 nheads=args.nb_heads,
+#                 alpha=args.alpha)
 optimizer = optim.Adam(model.parameters(),
                        lr=args.lr,
                        weight_decay=args.weight_decay)

@@ -1,9 +1,6 @@
 
 #GAT
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+
 
 import numpy as np
 import torch
@@ -35,8 +32,7 @@ class GraphAttentionLayer(nn.Module):
         N = h.size()[0]
         # print(N)  2708 nodes的个数
 
-        a_input = torch.cat([h.repeat(1, N).view(N * N, -1), h.repeat(N, 1)], dim=1).view(N, -1,
-                                                                                          2 * self.out_features)  # 见下图
+        a_input = torch.cat([h.repeat(1, N).view(N * N, -1), h.repeat(N, 1)], dim=1).view(N, -1,2 * self.out_features)
         # print(a_input.shape)  torch.Size([2708, 2708, 16])
 
         e = self.leakyrelu(torch.matmul(a_input, self.a).squeeze(2))  # 即论文里的eij
@@ -49,7 +45,7 @@ class GraphAttentionLayer(nn.Module):
         attention = torch.where(adj > 0, e, zero_vec)
 
         '''这里我们回想一下在utils.py里adj怎么建成的：两个节点有边，则为1，否则为0。
-        故adj的领接矩阵的大小为[2708,2708]。(不熟的自己去复习一下图结构中的领接矩阵)。
+        故adj的邻接矩阵的大小为[2708,2708]。(不熟的自己去复习一下图结构中的领接矩阵)。
         print(adj）这里我们看其中一个adj
         tensor([[0.1667, 0.0000, 0.0000,  ..., 0.0000, 0.0000,   0.0000],
         [0.0000, 0.5000, 0.0000,  ..., 0.0000, 0.0000, 0.0000],
